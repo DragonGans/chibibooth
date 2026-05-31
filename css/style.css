@@ -101,6 +101,10 @@ canvas {
   max-width: 100%;
 }
 
+figure {
+  margin: 0;
+}
+
 .hidden {
   display: none !important;
 }
@@ -204,8 +208,10 @@ p {
   padding: 0.85rem 1.25rem;
   font-weight: 800;
   cursor: pointer;
+  line-height: 1.12;
+  text-align: center;
   transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .button:hover {
@@ -355,15 +361,26 @@ textarea:focus {
 
 .photostrip-demo {
   width: min(18.5rem, 86vw);
-  padding: 1rem 1rem 1.4rem;
+  aspect-ratio: 862 / 1825;
+  padding: 0;
   border: 8px solid #fff;
   border-radius: 30px;
-  background:
-    radial-gradient(circle at 16% 12%, rgba(255, 255, 255, 0.85) 0 0.7rem, transparent 0.75rem),
-    linear-gradient(180deg, var(--pink-100), var(--cream));
+  background: rgba(255, 255, 255, 0.64);
   box-shadow: var(--shadow);
   transform: rotate(3deg);
   animation: floaty 4.5s ease-in-out infinite;
+}
+
+.photostrip-demo .demo-photo,
+.photostrip-demo p {
+  display: none;
+}
+
+.photostrip-demo img {
+  width: 100%;
+  height: 100%;
+  border-radius: 22px;
+  object-fit: cover;
 }
 
 .demo-photo {
@@ -469,11 +486,19 @@ textarea:focus {
   position: absolute;
   right: -2.8rem;
   bottom: -3.4rem;
+  z-index: 0;
   width: 8rem;
   height: 8rem;
   content: "";
+  pointer-events: none;
   border-radius: 999px;
   background: rgba(255, 171, 201, 0.22);
+}
+
+.feature-card > *,
+.sample-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .feature-icon {
@@ -506,15 +531,24 @@ textarea:focus {
 
 .sample-frame {
   display: grid;
-  min-height: 13rem;
+  overflow: hidden;
+  height: 13rem;
   place-items: center;
   margin-bottom: 1rem;
   border: 7px solid rgba(255, 255, 255, 0.82);
   border-radius: 28px;
-  color: rgba(255, 255, 255, 0.95);
+  color: transparent;
+  background: #fff url("../assets/samples/ai-photostrip-demo.png") center / cover no-repeat;
   font-family: var(--font-display);
-  font-size: 2.7rem;
+  font-size: 0;
   font-weight: 900;
+}
+
+.sample-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .sample-pink .sample-frame {
@@ -565,6 +599,45 @@ textarea:focus {
 
   .sample-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .site-header {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 0.65rem;
+    width: min(100% - 1rem, 1120px);
+  }
+
+  .brand {
+    order: 2;
+  }
+
+  .header-actions {
+    order: 1;
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.15rem;
+    scrollbar-width: none;
+  }
+
+  .header-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .header-actions a,
+  .theme-toggle,
+  .text-button {
+    padding: 0.64rem 0.78rem;
+    font-size: 0.84rem;
+  }
+
+  main {
+    width: min(100% - 1rem, 1120px);
   }
 }
 

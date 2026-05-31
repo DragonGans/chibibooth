@@ -21,6 +21,17 @@
     "cekrek dulu, kangen kemudian"
   ];
 
+  const shareCaptions = [
+    "Made with ChibiBooth - cekrek dulu, kenangan kemudian.",
+    "Hari ini masuk album kecilku di ChibiBooth.",
+    "Soft moment, sweet memory, saved by ChibiBooth.",
+    "Foto kecil, memorinya panjang.",
+    "ChibiBooth dulu, post cantik kemudian.",
+    "Captured this cute little moment with ChibiBooth.",
+    "Satu sesi, banyak cerita.",
+    "Memory pastel dari ChibiBooth."
+  ];
+
   const state = {
     originalPhotos: [],
     photos: [],
@@ -114,6 +125,18 @@
     button.innerHTML = content || `<strong>${label}</strong><span>${sublabel || ""}</span>`;
     button.addEventListener("click", onClick);
     return button;
+  }
+
+  function pickRandom(items, currentValue) {
+    if (!items.length) return "";
+    if (items.length === 1) return items[0];
+
+    let nextValue = currentValue;
+    while (nextValue === currentValue) {
+      nextValue = items[Math.floor(Math.random() * items.length)];
+    }
+
+    return nextValue;
   }
 
   function buildFrameControls() {
@@ -246,7 +269,7 @@
     });
 
     elements.randomCaptionButton.addEventListener("click", () => {
-      const caption = cuteCaptions[Math.floor(Math.random() * cuteCaptions.length)];
+      const caption = pickRandom(cuteCaptions, state.customText);
       state.customText = caption;
       elements.customTextInput.value = caption;
       requestRender();
@@ -256,18 +279,12 @@
       await window.ChibiShare.downloadCanvas(elements.canvas);
     });
 
-    elements.downloadSquareButton.addEventListener("click", async () => {
-      const exportCanvas = await window.ChibiCanvas.createExportCanvas(getRenderOptions("square"), "square");
-      await window.ChibiShare.downloadCanvas(exportCanvas, `square-${new Date().toISOString().slice(0, 10)}`);
-    });
-
-    elements.downloadStoryButton.addEventListener("click", async () => {
-      const exportCanvas = await window.ChibiCanvas.createExportCanvas(getRenderOptions("story"), "story");
-      await window.ChibiShare.downloadCanvas(exportCanvas);
-    });
-
     elements.shareButton.addEventListener("click", async () => {
       await window.ChibiShare.shareCanvas(elements.canvas, elements.captionInput.value);
+    });
+
+    elements.randomShareCaptionButton.addEventListener("click", () => {
+      elements.captionInput.value = pickRandom(shareCaptions, elements.captionInput.value.trim());
     });
 
     elements.copyCaptionButton.addEventListener("click", async () => {
@@ -343,10 +360,9 @@
       "randomFrameButton",
       "randomCaptionButton",
       "downloadButton",
-      "downloadSquareButton",
-      "downloadStoryButton",
       "shareButton",
       "copyCaptionButton",
+      "randomShareCaptionButton",
       "captionInput",
       "generateAIButton",
       "aiStatus",

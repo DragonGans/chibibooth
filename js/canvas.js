@@ -54,15 +54,25 @@
   }
 
   function getPhotoRects(count, width, height, mode) {
+    const photoCount = Math.max(1, count);
+
     if (mode === "square") {
-      if (count === 1) {
-        return [{ x: 150, y: 155, width: 780, height: 680, radius: 46, polaroid: true }];
+      if (photoCount === 1) {
+        return [{ x: 150, y: 140, width: 780, height: 650, radius: 46, polaroid: true }];
       }
 
-      if (count === 2) {
+      if (photoCount === 2) {
         return [
           { x: 130, y: 130, width: 820, height: 360, radius: 44 },
           { x: 130, y: 540, width: 820, height: 360, radius: 44 }
+        ];
+      }
+
+      if (photoCount === 3) {
+        return [
+          { x: 140, y: 120, width: 800, height: 330, radius: 42 },
+          { x: 115, y: 505, width: 390, height: 330, radius: 40 },
+          { x: 575, y: 505, width: 390, height: 330, radius: 40 }
         ];
       }
 
@@ -74,22 +84,30 @@
       ];
     }
 
-    if (count === 1) {
-      return [{ x: 140, y: 270, width: 800, height: 980, radius: 54, polaroid: true }];
+    if (photoCount === 1) {
+      return [{ x: 140, y: 270, width: 800, height: 920, radius: 54, polaroid: true }];
     }
 
-    if (count === 2) {
+    if (photoCount === 2) {
       return [
         { x: 125, y: 260, width: 830, height: 560, radius: 52 },
         { x: 125, y: 900, width: 830, height: 560, radius: 52 }
       ];
     }
 
+    if (photoCount === 3) {
+      return [
+        { x: 185, y: 250, width: 710, height: 385, radius: 48 },
+        { x: 185, y: 715, width: 710, height: 385, radius: 48 },
+        { x: 185, y: 1180, width: 710, height: 385, radius: 48 }
+      ];
+    }
+
     return [
-      { x: 220, y: 180, width: 640, height: 360, radius: 46 },
-      { x: 220, y: 575, width: 640, height: 360, radius: 46 },
-      { x: 220, y: 970, width: 640, height: 360, radius: 46 },
-      { x: 220, y: 1365, width: 640, height: 360, radius: 46 }
+      { x: 215, y: 190, width: 650, height: 320, radius: 46 },
+      { x: 215, y: 545, width: 650, height: 320, radius: 46 },
+      { x: 215, y: 900, width: 650, height: 320, radius: 46 },
+      { x: 215, y: 1255, width: 650, height: 320, radius: 46 }
     ];
   }
 
@@ -225,7 +243,8 @@
       const rects = getPhotoRects(images.length, width, height, mode);
 
       rects.forEach((rect, index) => {
-        const image = images[index % images.length];
+        const image = images[index];
+        if (!image) return;
         drawPhotoSlot(ctx, image, rect, canvasFilter, index);
       });
     } else {

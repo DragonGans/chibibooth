@@ -7,7 +7,7 @@ ChibiBooth adalah web photobooth online yang cute, pastel, romantis, dan mobile-
 - Landing page cute dengan nuansa Korea/Jepang photobooth.
 - Kamera browser memakai `navigator.mediaDevices.getUserMedia()`.
 - Timer 3, 5, dan 10 detik.
-- Pilihan 1, 2, atau 4 foto.
+- Pilihan 1, 2, 3, atau 4 foto.
 - Switch kamera depan/belakang, mirror selfie mode, fullscreen camera, dan retake.
 - Editor canvas 1080 x 1920 untuk output HD.
 - 8 frame canvas drawing: Pink Hearts, Bear Cute, Cloud Pastel, Romantic Rose, Love Letter, Lavender Dream, Birthday Party, Bestie Mode.
@@ -16,7 +16,7 @@ ChibiBooth adalah web photobooth online yang cute, pastel, romantis, dan mobile-
 - Stiker emoji/canvas sederhana dengan pilihan posisi.
 - Demo AI Style lokal tanpa API key frontend.
 - Real AI API placeholder via `POST /api/ai-style`.
-- Download PNG, Web Share API fallback, copy caption, save square, dan save story.
+- Download PNG, Web Share API fallback, copy caption, dan random share caption.
 - Penyimpanan sementara memakai `sessionStorage` dan preferensi editor memakai `localStorage`.
 
 ## Cara Menjalankan
@@ -101,6 +101,5 @@ chibibooth/
 - Drag-and-drop stiker langsung di canvas.
 - Galeri memories lokal.
 - Backend/serverless AI style sungguhan.
-- QR download link sungguhan.
 - Template frame tambahan dari asset SVG/PNG.
 - Export ZIP untuk banyak format sekaligus.

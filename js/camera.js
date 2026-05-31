@@ -7,6 +7,7 @@
   const statusEl = document.getElementById("cameraStatus");
   const countdownEl = document.getElementById("countdown");
   const flashEl = document.getElementById("flash");
+  const enableCameraButton = document.getElementById("enableCameraButton");
   const captureButton = document.getElementById("captureButton");
   const switchCameraButton = document.getElementById("switchCameraButton");
   const retakeButton = document.getElementById("retakeButton");
@@ -14,8 +15,6 @@
   const mirrorToggle = document.getElementById("mirrorToggle");
   const timerSelect = document.getElementById("timerSelect");
   const photoCountSelect = document.getElementById("photoCountSelect");
-  const shotList = document.getElementById("shotList");
-  const progressLabel = document.getElementById("progressLabel");
 
   let stream = null;
   let facingMode = "user";
@@ -32,23 +31,60 @@
   }
 
   function setControlsDisabled(disabled) {
-    [captureButton, switchCameraButton, retakeButton, timerSelect, photoCountSelect, mirrorToggle].forEach((control) => {
+    [enableCameraButton, captureButton, switchCameraButton, retakeButton, timerSelect, photoCountSelect, mirrorToggle].forEach((control) => {
       control.disabled = disabled;
     });
   }
 
-  function stopStream() {
-    if (!stream) return;
+  function isLocalHost() {
+    return ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+  }
 
-    stream.getTracks().forEach((track) => track.stop());
+  function canRequestCamera() {
+    return window.isSecureContext || isLocalHost();
+  }
+
+  function updateCameraControls() {
+    const hasStream = Boolean(stream);
+    enableCameraButton.hidden = hasStream;
+    captureButton.textContent = hasStream ? "Ambil Foto" : "Aktifkan & Ambil Foto";
+    switchCameraButton.disabled = !hasStream || isCapturing;
+  }
+
+  function stopStream() {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+    }
+
     stream = null;
     video.srcObject = null;
     cameraStage.classList.remove("has-stream");
+    updateCameraControls();
+  }
+
+  async function requestCameraStream(constraints) {
+    try {
+      return await navigator.mediaDevices.getUserMedia(constraints);
+    } catch (error) {
+      if (error.name !== "OverconstrainedError" && error.name !== "NotFoundError") {
+        throw error;
+      }
+
+      return navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: true
+      });
+    }
   }
 
   async function startCamera() {
+    if (!canRequestCamera()) {
+      setStatus("Izin kamera di HP hanya muncul lewat HTTPS. Buka versi HTTPS/deploy dulu ya.", true);
+      return;
+    }
+
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setStatus("Browser ini belum mendukung akses kamera.", true);
+      setStatus("Browser ini belum bisa membuka kamera. Coba pakai Chrome/Safari terbaru lewat HTTPS.", true);
       return;
     }
 
@@ -56,7 +92,7 @@
     setStatus("Membuka kamera...");
 
     try {
-      stream = await navigator.mediaDevices.getUserMedia({
+      stream = await requestCameraStream({
         audio: false,
         video: {
           facingMode: { ideal: facingMode },
@@ -69,11 +105,17 @@
       await video.play();
       cameraStage.classList.add("has-stream");
       updateMirrorMode();
+      updateCameraControls();
       setStatus("Kamera siap. Pilih timer, lalu cekrek!");
     } catch (error) {
       console.error("Camera error:", error);
       stopStream();
-      setStatus("Kamera belum diizinkan. Aktifkan izin kamera dulu yaa.", true);
+      if (error.name === "NotAllowedError" || error.name === "SecurityError") {
+        setStatus("Kamera belum diizinkan. Tap ikon gembok/browser lalu aktifkan izin kamera.", true);
+        return;
+      }
+
+      setStatus("Kamera belum bisa dibuka. Pastikan izin kamera aktif dan halaman dibuka lewat HTTPS.", true);
     }
   }
 
@@ -148,17 +190,8 @@
     return canvas.toDataURL("image/jpeg", 0.94);
   }
 
-  function addShotPreview(dataUrl, index) {
-    const item = document.createElement("div");
-    item.className = "shot-thumb";
-    item.innerHTML = `<img src="${dataUrl}" alt="Foto ${index} ChibiBooth">`;
-    shotList.appendChild(item);
-  }
-
   function resetShots() {
     capturedPhotos = [];
-    shotList.innerHTML = "";
-    progressLabel.textContent = "Belum ada foto";
     sessionStorage.removeItem(STORAGE_PHOTOS);
     sessionStorage.removeItem(STORAGE_META);
     setStatus("Foto diulang. Pose baru, aura baru.");
@@ -180,7 +213,6 @@
 
     try {
       for (let index = 1; index <= totalPhotos; index += 1) {
-        progressLabel.textContent = `Foto ${index} dari ${totalPhotos}`;
         setStatus(`Siap-siap foto ${index}. Jangan lupa senyum gemoy.`);
         await runCountdown(timerSeconds);
         triggerFlash();
@@ -188,7 +220,6 @@
 
         const dataUrl = takeSnapshot();
         capturedPhotos.push(dataUrl);
-        addShotPreview(dataUrl, index);
         await wait(520);
       }
 
@@ -198,7 +229,6 @@
         createdAt: new Date().toISOString()
       }));
 
-      progressLabel.textContent = "Selesai, menuju editor...";
       setStatus("Foto tersimpan sementara. Membuka editor...");
       stopStream();
       await wait(650);
@@ -209,6 +239,7 @@
     } finally {
       isCapturing = false;
       setControlsDisabled(false);
+      updateCameraControls();
     }
   }
 
@@ -230,6 +261,7 @@
   }
 
   function bindEvents() {
+    enableCameraButton.addEventListener("click", startCamera);
     captureButton.addEventListener("click", captureSequence);
     switchCameraButton.addEventListener("click", switchCamera);
     retakeButton.addEventListener("click", resetShots);
@@ -241,15 +273,11 @@
       if (document.visibilityState === "hidden" && !isCapturing) {
         stopStream();
       }
-
-      if (document.visibilityState === "visible" && !stream) {
-        startCamera();
-      }
     });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     bindEvents();
-    startCamera();
+    updateCameraControls();
   });
 })();

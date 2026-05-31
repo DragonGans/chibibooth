@@ -43,7 +43,7 @@
       </div>
 
       <p class="camera-status" id="cameraStatus" role="status">
-        Fitur kamera berjalan di localhost atau HTTPS.
+        Tap Aktifkan Kamera. Di HP, izin kamera hanya muncul jika halaman dibuka lewat HTTPS.
       </p>
 
       <div class="booth-controls">
@@ -60,13 +60,15 @@
           <select id="photoCountSelect">
             <option value="1">1 foto</option>
             <option value="2">2 foto</option>
+            <option value="3">3 foto</option>
             <option value="4" selected>4 foto</option>
           </select>
         </label>
       </div>
 
       <div class="booth-actions">
-        <button class="button button-primary" type="button" id="captureButton">Ambil Foto</button>
+        <button class="button button-primary" type="button" id="enableCameraButton">Aktifkan Kamera</button>
+        <button class="button button-secondary" type="button" id="captureButton">Ambil Foto</button>
         <button class="button button-secondary" type="button" id="switchCameraButton">Ganti Kamera</button>
         <button class="button button-soft" type="button" id="retakeButton">Ulangi</button>
       </div>
@@ -79,15 +81,6 @@
         <button class="text-button" type="button" id="fullscreenButton">Fullscreen camera</button>
       </div>
     </section>
-
-    <aside class="shot-panel">
-      <p class="eyebrow">hasil sementara</p>
-      <h2 id="progressLabel">Belum ada foto</h2>
-      <div class="shot-list" id="shotList" aria-live="polite"></div>
-      <p class="note">
-        Kalau kamera ditolak: “Kamera belum diizinkan. Aktifkan izin kamera dulu yaa.”
-      </p>
-    </aside>
   </main>
 </body>
 </html>
