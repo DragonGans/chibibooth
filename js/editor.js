@@ -9,27 +9,27 @@
   };
 
   const cuteCaptions = [
-    "ChibiBooth Memories",
-    "our memories",
-    "best day ever",
-    "with you",
-    "soft little moments",
-    "gemoy forever",
-    "tiny joy, big memory",
-    "love in pastel",
-    "bestie sparkle mode",
-    "cekrek dulu, kangen kemudian"
+    "ChibiBooth Memories ♡",
+    "our memories ✨",
+    "best day ever ♡",
+    "with you ♡",
+    "soft little moments ☁️",
+    "gemoy forever 🫶",
+    "tiny joy, big memory ✨",
+    "love in pastel 💗",
+    "bestie sparkle mode 🌟",
+    "cekrek dulu, kangen kemudian 🥹"
   ];
 
   const shareCaptions = [
-    "Made with ChibiBooth - cekrek dulu, kenangan kemudian.",
-    "Hari ini masuk album kecilku di ChibiBooth.",
-    "Soft moment, sweet memory, saved by ChibiBooth.",
-    "Foto kecil, memorinya panjang.",
-    "ChibiBooth dulu, post cantik kemudian.",
-    "Captured this cute little moment with ChibiBooth.",
-    "Satu sesi, banyak cerita.",
-    "Memory pastel dari ChibiBooth."
+    "Made with ChibiBooth ✨ cekrek dulu, kenangan kemudian ♡",
+    "Hari ini masuk album kecilku di ChibiBooth 🫶",
+    "Soft moment, sweet memory, saved by ChibiBooth ☁️",
+    "Foto kecil, memorinya panjang 🥹",
+    "ChibiBooth dulu, post cantik kemudian 💗",
+    "Captured this cute little moment with ChibiBooth ✨",
+    "Satu sesi, banyak cerita ♡",
+    "Memory pastel dari ChibiBooth 🌷"
   ];
 
   const state = {
@@ -38,7 +38,7 @@
     pendingAIPhotos: null,
     frameId: localStorage.getItem(STORAGE.frame) || "pink-hearts",
     filterId: localStorage.getItem(STORAGE.filter) || "normal",
-    customText: localStorage.getItem(STORAGE.text) || "ChibiBooth Memories",
+    customText: localStorage.getItem(STORAGE.text) || "ChibiBooth Memories ♡",
     textColor: localStorage.getItem(STORAGE.textColor) || "#6f4a62",
     textSize: Number(localStorage.getItem(STORAGE.textSize)) || 72,
     textPosition: "bottom",
@@ -229,9 +229,12 @@
     elements.customTextInput.value = state.customText;
     elements.textColorInput.value = state.textColor;
     elements.textSizeInput.value = state.textSize;
+    if (!elements.captionInput.value.trim() || elements.captionInput.value.includes("â")) {
+      elements.captionInput.value = shareCaptions[0];
+    }
 
     elements.customTextInput.addEventListener("input", (event) => {
-      state.customText = event.target.value || "ChibiBooth Memories";
+      state.customText = event.target.value || "ChibiBooth Memories ♡";
       requestRender();
     });
 

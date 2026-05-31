@@ -639,6 +639,34 @@ textarea:focus {
   main {
     width: min(100% - 1rem, 1120px);
   }
+
+  .landing-page .brand {
+    margin-inline: auto;
+  }
+
+  .landing-page .hero-copy,
+  .landing-page .section-heading,
+  .landing-page .feature-card,
+  .landing-page .sample-card,
+  .landing-page .site-footer {
+    text-align: center;
+  }
+
+  .landing-page .hero-text {
+    margin-inline: auto;
+  }
+
+  .landing-page .hero-actions {
+    justify-content: center;
+  }
+
+  .landing-page .microcopy {
+    margin-inline: auto;
+  }
+
+  .landing-page .feature-icon {
+    margin-inline: auto;
+  }
 }
 
 @media (min-width: 980px) {

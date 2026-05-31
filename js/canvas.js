@@ -53,62 +53,133 @@
     ctx.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
   }
 
+  function getStackedRects({ count, width, startY, endY, slotWidth, gap, radius, photoRatio }) {
+    const availableHeight = endY - startY;
+    const slotHeight = Math.min((availableHeight - (count - 1) * gap) / count, slotWidth / photoRatio);
+    const totalHeight = slotHeight * count + gap * (count - 1);
+    const yOffset = startY + (availableHeight - totalHeight) / 2;
+
+    return Array.from({ length: count }, (_, index) => ({
+      x: (width - slotWidth) / 2,
+      y: yOffset + index * (slotHeight + gap),
+      width: slotWidth,
+      height: slotHeight,
+      radius
+    }));
+  }
+
+  function getGridRects({ columns, rows, width, startY, endY, slotWidth, gap, radius, photoRatio }) {
+    const slotHeight = slotWidth / photoRatio;
+    const totalWidth = columns * slotWidth + (columns - 1) * gap;
+    const totalHeight = rows * slotHeight + (rows - 1) * gap;
+    const xOffset = (width - totalWidth) / 2;
+    const yOffset = startY + ((endY - startY) - totalHeight) / 2;
+    const rects = [];
+
+    for (let row = 0; row < rows; row += 1) {
+      for (let column = 0; column < columns; column += 1) {
+        rects.push({
+          x: xOffset + column * (slotWidth + gap),
+          y: yOffset + row * (slotHeight + gap),
+          width: slotWidth,
+          height: slotHeight,
+          radius
+        });
+      }
+    }
+
+    return rects;
+  }
+
   function getPhotoRects(count, width, height, mode) {
     const photoCount = Math.max(1, count);
+    const photoRatio = 1.85;
 
     if (mode === "square") {
       if (photoCount === 1) {
-        return [{ x: 150, y: 140, width: 780, height: 650, radius: 46, polaroid: true }];
+        return [{ x: 150, y: 135, width: 780, height: 650, radius: 46, polaroid: true }];
       }
 
       if (photoCount === 2) {
-        return [
-          { x: 130, y: 130, width: 820, height: 360, radius: 44 },
-          { x: 130, y: 540, width: 820, height: 360, radius: 44 }
-        ];
+        return getStackedRects({
+          count: 2,
+          width,
+          startY: 120,
+          endY: 840,
+          slotWidth: 560,
+          gap: 34,
+          radius: 42,
+          photoRatio
+        });
       }
 
       if (photoCount === 3) {
-        return [
-          { x: 140, y: 120, width: 800, height: 330, radius: 42 },
-          { x: 115, y: 505, width: 390, height: 330, radius: 40 },
-          { x: 575, y: 505, width: 390, height: 330, radius: 40 }
-        ];
+        return getGridRects({
+          columns: 2,
+          rows: 2,
+          width,
+          startY: 120,
+          endY: 840,
+          slotWidth: 360,
+          gap: 32,
+          radius: 38,
+          photoRatio
+        }).slice(0, 3);
       }
 
-      return [
-        { x: 110, y: 130, width: 410, height: 330, radius: 40 },
-        { x: 560, y: 130, width: 410, height: 330, radius: 40 },
-        { x: 110, y: 505, width: 410, height: 330, radius: 40 },
-        { x: 560, y: 505, width: 410, height: 330, radius: 40 }
-      ];
+      return getGridRects({
+        columns: 2,
+        rows: 2,
+        width,
+        startY: 120,
+        endY: 840,
+        slotWidth: 360,
+        gap: 32,
+        radius: 38,
+        photoRatio
+      });
     }
 
     if (photoCount === 1) {
-      return [{ x: 140, y: 270, width: 800, height: 920, radius: 54, polaroid: true }];
+      return [{ x: 160, y: 255, width: 760, height: 880, radius: 52, polaroid: true }];
     }
 
     if (photoCount === 2) {
-      return [
-        { x: 125, y: 260, width: 830, height: 560, radius: 52 },
-        { x: 125, y: 900, width: 830, height: 560, radius: 52 }
-      ];
+      return getStackedRects({
+        count: 2,
+        width,
+        startY: 220,
+        endY: 1530,
+        slotWidth: 650,
+        gap: 42,
+        radius: 48,
+        photoRatio
+      });
     }
 
     if (photoCount === 3) {
-      return [
-        { x: 185, y: 250, width: 710, height: 385, radius: 48 },
-        { x: 185, y: 715, width: 710, height: 385, radius: 48 },
-        { x: 185, y: 1180, width: 710, height: 385, radius: 48 }
-      ];
+      return getStackedRects({
+        count: 3,
+        width,
+        startY: 210,
+        endY: 1580,
+        slotWidth: 520,
+        gap: 34,
+        radius: 44,
+        photoRatio
+      });
     }
 
-    return [
-      { x: 215, y: 190, width: 650, height: 320, radius: 46 },
-      { x: 215, y: 545, width: 650, height: 320, radius: 46 },
-      { x: 215, y: 900, width: 650, height: 320, radius: 46 },
-      { x: 215, y: 1255, width: 650, height: 320, radius: 46 }
-    ];
+    return getStackedRects({
+      count: 4,
+      width,
+      startY: 200,
+      endY: 1580,
+      slotWidth: 430,
+      gap: 28,
+      radius: 40,
+      photoRatio
+    });
   }
 
   function combineFilters(filter, beautify) {
