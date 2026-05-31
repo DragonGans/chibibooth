@@ -55,22 +55,28 @@
 
   function getStackedRects({ count, width, startY, endY, slotWidth, gap, radius, photoRatio }) {
     const availableHeight = endY - startY;
-    const slotHeight = Math.min((availableHeight - (count - 1) * gap) / count, slotWidth / photoRatio);
+    const maxHeight = (availableHeight - (count - 1) * gap) / count;
+    const desiredHeight = slotWidth / photoRatio;
+    const slotHeight = Math.min(maxHeight, desiredHeight);
+    const actualSlotWidth = slotHeight * photoRatio;
     const totalHeight = slotHeight * count + gap * (count - 1);
     const yOffset = startY + (availableHeight - totalHeight) / 2;
 
     return Array.from({ length: count }, (_, index) => ({
-      x: (width - slotWidth) / 2,
+      x: (width - actualSlotWidth) / 2,
       y: yOffset + index * (slotHeight + gap),
-      width: slotWidth,
+      width: actualSlotWidth,
       height: slotHeight,
       radius
     }));
   }
 
   function getGridRects({ columns, rows, width, startY, endY, slotWidth, gap, radius, photoRatio }) {
-    const slotHeight = slotWidth / photoRatio;
-    const totalWidth = columns * slotWidth + (columns - 1) * gap;
+    const maxHeight = ((endY - startY) - (rows - 1) * gap) / rows;
+    const desiredHeight = slotWidth / photoRatio;
+    const slotHeight = Math.min(maxHeight, desiredHeight);
+    const actualSlotWidth = slotHeight * photoRatio;
+    const totalWidth = columns * actualSlotWidth + (columns - 1) * gap;
     const totalHeight = rows * slotHeight + (rows - 1) * gap;
     const xOffset = (width - totalWidth) / 2;
     const yOffset = startY + ((endY - startY) - totalHeight) / 2;
@@ -79,9 +85,9 @@
     for (let row = 0; row < rows; row += 1) {
       for (let column = 0; column < columns; column += 1) {
         rects.push({
-          x: xOffset + column * (slotWidth + gap),
+          x: xOffset + column * (actualSlotWidth + gap),
           y: yOffset + row * (slotHeight + gap),
-          width: slotWidth,
+          width: actualSlotWidth,
           height: slotHeight,
           radius
         });
@@ -93,7 +99,7 @@
 
   function getPhotoRects(count, width, height, mode) {
     const photoCount = Math.max(1, count);
-    const photoRatio = 1.85;
+    const photoRatio = 0.82;
 
     if (mode === "square") {
       if (photoCount === 1) {
@@ -106,8 +112,8 @@
           width,
           startY: 120,
           endY: 840,
-          slotWidth: 560,
-          gap: 34,
+          slotWidth: 520,
+          gap: 42,
           radius: 42,
           photoRatio
         });
@@ -120,8 +126,8 @@
           width,
           startY: 120,
           endY: 840,
-          slotWidth: 360,
-          gap: 32,
+          slotWidth: 300,
+          gap: 42,
           radius: 38,
           photoRatio
         }).slice(0, 3);
@@ -133,8 +139,8 @@
         width,
         startY: 120,
         endY: 840,
-        slotWidth: 360,
-        gap: 32,
+        slotWidth: 300,
+        gap: 42,
         radius: 38,
         photoRatio
       });
@@ -150,8 +156,8 @@
         width,
         startY: 220,
         endY: 1530,
-        slotWidth: 650,
-        gap: 42,
+        slotWidth: 560,
+        gap: 54,
         radius: 48,
         photoRatio
       });
@@ -162,8 +168,8 @@
         count: 3,
         width,
         startY: 210,
-        endY: 1580,
-        slotWidth: 520,
+        endY: 1565,
+        slotWidth: 660,
         gap: 34,
         radius: 44,
         photoRatio
@@ -173,9 +179,9 @@
     return getStackedRects({
       count: 4,
       width,
-      startY: 200,
-      endY: 1580,
-      slotWidth: 430,
+      startY: 210,
+      endY: 1565,
+      slotWidth: 620,
       gap: 28,
       radius: 40,
       photoRatio

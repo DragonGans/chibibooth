@@ -143,8 +143,9 @@
         audio: false,
         video: {
           facingMode: { ideal: facingMode },
-          width: { ideal: 1280 },
-          height: { ideal: 960 }
+          aspectRatio: { ideal: 3 / 4 },
+          width: { ideal: 1440 },
+          height: { ideal: 1920 }
         }
       });
 
@@ -221,12 +222,18 @@
       throw new Error("Video belum siap untuk dipotret.");
     }
 
+    const maxLongEdge = 1600;
+    const sourceWidth = video.videoWidth;
+    const sourceHeight = video.videoHeight;
+    const scale = Math.min(1, maxLongEdge / Math.max(sourceWidth, sourceHeight));
     const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    canvas.width = Math.round(sourceWidth * scale);
+    canvas.height = Math.round(sourceHeight * scale);
 
     const context = canvas.getContext("2d");
     const shouldMirror = mirrorToggle.checked && facingMode === "user";
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
 
     if (shouldMirror) {
       context.translate(canvas.width, 0);
@@ -234,7 +241,7 @@
     }
 
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL("image/jpeg", 0.94);
+    return canvas.toDataURL("image/jpeg", 0.9);
   }
 
   function resetShots() {
