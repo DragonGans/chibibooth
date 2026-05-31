@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Edit photostrip ChibiBooth dengan frame, filter, teks, stiker, dan AI style.">
+  <title>Editor | ChibiBooth</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/editor.css">
+  <script defer src="js/main.js"></script>
+  <script defer src="js/frames.js"></script>
+  <script defer src="js/filters.js"></script>
+  <script defer src="js/stickers.js"></script>
+  <script defer src="js/ai.js"></script>
+  <script defer src="js/canvas.js"></script>
+  <script defer src="js/share.js"></script>
+  <script defer src="js/editor.js"></script>
+</head>
+<body class="editor-page">
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="ChibiBooth home">
+      <span class="brand-mark">♡</span>
+      <span>ChibiBooth</span>
+    </a>
+    <nav class="header-actions" aria-label="Navigasi editor">
+      <a href="booth.html">Foto Ulang</a>
+      <button class="theme-toggle" type="button" data-theme-toggle>Pastel Mode</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="empty-state hidden" id="emptyState">
+      <div class="empty-card">
+        <p class="eyebrow">oopsie</p>
+        <h1>Belum ada foto nih. Ambil foto dulu yaa.</h1>
+        <a class="button button-primary" href="booth.html">Mulai Foto</a>
+      </div>
+    </section>
+
+    <section class="editor-shell" id="editorShell">
+      <div class="preview-panel">
+        <div class="preview-header">
+          <div>
+            <p class="eyebrow">preview canvas</p>
+            <h1>Memory kamu siap dipercantik</h1>
+          </div>
+          <button class="button button-soft" type="button" id="randomFrameButton">Random Frame</button>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="resultCanvas" width="1080" height="1920" aria-label="Preview hasil ChibiBooth"></canvas>
+        </div>
+        <div class="preview-actions">
+          <button class="button button-primary" type="button" id="downloadButton">Download PNG</button>
+          <button class="button button-secondary" type="button" id="shareButton">Share</button>
+          <button class="button button-soft" type="button" id="downloadSquareButton">Save Square</button>
+          <button class="button button-soft" type="button" id="downloadStoryButton">Save Story</button>
+          <a class="button button-ghost" href="booth.html" id="retakeLink">Foto Ulang</a>
+        </div>
+      </div>
+
+      <aside class="control-panel">
+        <section class="control-card">
+          <div class="control-title">
+            <h2>Frame Lucu</h2>
+            <p>Pilih mood bingkai kamu.</p>
+          </div>
+          <div class="option-grid frame-grid" id="frameList"></div>
+        </section>
+
+        <section class="control-card">
+          <div class="control-title">
+            <h2>Filter Foto</h2>
+            <p>Preview canvas update otomatis.</p>
+          </div>
+          <div class="option-grid" id="filterList"></div>
+          <label class="toggle-row beautify-row">
+            <input type="checkbox" id="beautifyToggle">
+            <span>Auto beautify demo filter</span>
+          </label>
+        </section>
+
+        <section class="control-card">
+          <div class="control-title">
+            <h2>Teks Custom</h2>
+            <p>Tambahkan caption manis.</p>
+          </div>
+          <label>
+            Teks
+            <input id="customTextInput" type="text" maxlength="60" placeholder="contoh: our memories, best day ever, with you">
+          </label>
+          <div class="control-row">
+            <label>
+              Warna
+              <input id="textColorInput" type="color" value="#6f4a62">
+            </label>
+            <label>
+              Ukuran
+              <input id="textSizeInput" type="range" min="42" max="110" value="72">
+            </label>
+          </div>
+          <label>
+            Posisi
+            <select id="textPositionSelect">
+              <option value="top">Atas</option>
+              <option value="middle">Tengah</option>
+              <option value="bottom" selected>Bawah</option>
+            </select>
+          </label>
+          <button class="text-button" type="button" id="randomCaptionButton">Random cute caption</button>
+        </section>
+
+        <section class="control-card">
+          <div class="control-title">
+            <h2>Stiker</h2>
+            <p>Pilih stiker dan posisi di sekitar frame.</p>
+          </div>
+          <div class="option-grid sticker-grid" id="stickerList"></div>
+          <label>
+            Posisi stiker
+            <select id="stickerPositionSelect">
+              <option value="top-left">Kiri atas</option>
+              <option value="top-right" selected>Kanan atas</option>
+              <option value="bottom-left">Kiri bawah</option>
+              <option value="bottom-right">Kanan bawah</option>
+            </select>
+          </label>
+        </section>
+
+        <section class="control-card ai-card">
+          <div class="control-title">
+            <h2>AI Magic Style</h2>
+            <p><span class="pill">Demo AI Style</span> tetap jalan tanpa API.</p>
+          </div>
+          <div class="option-grid ai-grid" id="aiStyleList"></div>
+          <button class="button button-primary" type="button" id="generateAIButton">Generate AI Style</button>
+          <p class="ai-status" id="aiStatus">Fitur AI asli membutuhkan backend/API agar aman.</p>
+          <div class="ai-actions hidden" id="aiActions">
+            <button class="button button-secondary" type="button" id="useAIButton">Pakai hasil AI</button>
+            <button class="button button-soft" type="button" id="useOriginalButton">Kembali ke foto asli</button>
+          </div>
+        </section>
+
+        <section class="control-card">
+          <div class="control-title">
+            <h2>Share Caption</h2>
+            <p>Caption default untuk dibagikan.</p>
+          </div>
+          <textarea id="captionInput" rows="3">Made with ChibiBooth ✨ cekrek dulu, kenangan kemudian 💖</textarea>
+          <button class="button button-secondary" type="button" id="copyCaptionButton">Copy caption</button>
+          <div class="qr-placeholder" aria-label="QR download placeholder">
+            <span></span><span></span><span></span><span></span>
+            <strong>QR download placeholder</strong>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>
