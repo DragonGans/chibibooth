@@ -15,6 +15,11 @@
   const mirrorToggle = document.getElementById("mirrorToggle");
   const timerSelect = document.getElementById("timerSelect");
   const photoCountSelect = document.getElementById("photoCountSelect");
+  const shotPanel = document.getElementById("shotPanel");
+  const shotList = document.getElementById("shotList");
+  const progressLabel = document.getElementById("progressLabel");
+  const continueButton = document.getElementById("continueButton");
+  const shotNote = document.getElementById("shotNote");
 
   let stream = null;
   let facingMode = "user";
@@ -28,6 +33,48 @@
   function setStatus(message, isWarning) {
     statusEl.textContent = message;
     statusEl.classList.toggle("is-warning", Boolean(isWarning));
+  }
+
+  function persistShots() {
+    if (!capturedPhotos.length) {
+      sessionStorage.removeItem(STORAGE_PHOTOS);
+      sessionStorage.removeItem(STORAGE_META);
+      return;
+    }
+
+    sessionStorage.setItem(STORAGE_PHOTOS, JSON.stringify(capturedPhotos));
+    sessionStorage.setItem(STORAGE_META, JSON.stringify({
+      count: capturedPhotos.length,
+      createdAt: new Date().toISOString()
+    }));
+  }
+
+  function renderShotList() {
+    const targetCount = Number(photoCountSelect.value);
+    shotPanel.classList.toggle("hidden", capturedPhotos.length === 0);
+    progressLabel.textContent = `${capturedPhotos.length} / ${targetCount} foto`;
+    continueButton.disabled = capturedPhotos.length !== targetCount;
+
+    if (capturedPhotos.length === 0) {
+      shotList.innerHTML = "";
+      shotNote.textContent = "Hasil foto akan muncul di sini setelah kamu ambil gambar.";
+      return;
+    }
+
+    shotNote.textContent = capturedPhotos.length === targetCount
+      ? "Kalau semua sudah oke, lanjut edit. Kalau ada yang jelek, hapus lalu ambil foto lagi."
+      : "Masih ada slot kosong. Hapus yang jelek lalu ambil foto lagi sampai penuh.";
+
+    shotList.innerHTML = "";
+    capturedPhotos.forEach((dataUrl, index) => {
+      const item = document.createElement("article");
+      item.className = "shot-thumb";
+      item.innerHTML = `
+        <img src="${dataUrl}" alt="Foto ${index + 1} ChibiBooth">
+        <button class="shot-remove" type="button" data-remove-index="${index}" aria-label="Hapus foto ${index + 1}">Hapus</button>
+      `;
+      shotList.appendChild(item);
+    });
   }
 
   function setControlsDisabled(disabled) {
@@ -192,9 +239,22 @@
 
   function resetShots() {
     capturedPhotos = [];
-    sessionStorage.removeItem(STORAGE_PHOTOS);
-    sessionStorage.removeItem(STORAGE_META);
+    persistShots();
+    renderShotList();
     setStatus("Foto diulang. Pose baru, aura baru.");
+  }
+
+  async function goToEditor() {
+    if (capturedPhotos.length !== Number(photoCountSelect.value)) {
+      setStatus("Lengkapi dulu jumlah fotonya sebelum lanjut edit.", true);
+      return;
+    }
+
+    persistShots();
+    setStatus("Foto tersimpan sementara. Membuka editor...");
+    stopStream();
+    await wait(650);
+    window.location.href = "editor.html";
   }
 
   async function captureSequence() {
@@ -206,33 +266,34 @@
 
     const timerSeconds = Number(timerSelect.value);
     const totalPhotos = Number(photoCountSelect.value);
+    const remainingPhotos = Math.max(0, totalPhotos - capturedPhotos.length);
+
+    if (remainingPhotos === 0) {
+      setStatus("Jumlah foto sudah penuh. Hapus dulu kalau mau ambil ulang sebagian.", true);
+      return;
+    }
 
     isCapturing = true;
     setControlsDisabled(true);
-    resetShots();
 
     try {
-      for (let index = 1; index <= totalPhotos; index += 1) {
-        setStatus(`Siap-siap foto ${index}. Jangan lupa senyum gemoy.`);
+      for (let index = 1; index <= remainingPhotos; index += 1) {
+        const currentIndex = capturedPhotos.length + 1;
+        setStatus(`Siap-siap foto ${currentIndex} dari ${totalPhotos}. Jangan lupa senyum gemoy.`);
         await runCountdown(timerSeconds);
         triggerFlash();
         playShutterSound();
 
         const dataUrl = takeSnapshot();
         capturedPhotos.push(dataUrl);
+        renderShotList();
         await wait(520);
       }
 
-      sessionStorage.setItem(STORAGE_PHOTOS, JSON.stringify(capturedPhotos));
-      sessionStorage.setItem(STORAGE_META, JSON.stringify({
-        count: capturedPhotos.length,
-        createdAt: new Date().toISOString()
-      }));
-
-      setStatus("Foto tersimpan sementara. Membuka editor...");
-      stopStream();
-      await wait(650);
-      window.location.href = "editor.html";
+      persistShots();
+      setStatus(capturedPhotos.length === totalPhotos
+        ? "Semua foto sudah siap. Cek dulu hasilnya di samping, lalu lanjut edit."
+        : "Foto masuk. Masih ada slot kosong kalau mau tambah lagi.");
     } catch (error) {
       console.error("Capture error:", error);
       setStatus("Oops, foto gagal diambil. Coba ulangi yaa.", true);
@@ -265,8 +326,29 @@
     captureButton.addEventListener("click", captureSequence);
     switchCameraButton.addEventListener("click", switchCamera);
     retakeButton.addEventListener("click", resetShots);
+    continueButton.addEventListener("click", goToEditor);
     fullscreenButton.addEventListener("click", requestFullscreenCamera);
     mirrorToggle.addEventListener("change", updateMirrorMode);
+    photoCountSelect.addEventListener("change", () => {
+      const targetCount = Number(photoCountSelect.value);
+      if (capturedPhotos.length > targetCount) {
+        capturedPhotos = capturedPhotos.slice(0, targetCount);
+        persistShots();
+        setStatus("Jumlah foto disesuaikan dengan pilihan baru.");
+      }
+      renderShotList();
+    });
+
+    shotList.addEventListener("click", (event) => {
+      const removeButton = event.target.closest("[data-remove-index]");
+      if (!removeButton) return;
+
+      const index = Number(removeButton.getAttribute("data-remove-index"));
+      capturedPhotos.splice(index, 1);
+      persistShots();
+      renderShotList();
+      setStatus("Foto dihapus. Ambil lagi kalau mau ganti hasilnya.");
+    });
 
     window.addEventListener("beforeunload", stopStream);
     document.addEventListener("visibilitychange", () => {
@@ -278,6 +360,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     bindEvents();
+    renderShotList();
     updateCameraControls();
   });
 })();
