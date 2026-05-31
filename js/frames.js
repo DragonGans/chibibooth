@@ -324,21 +324,21 @@
   function drawFrameForeground(ctx, width, height, frame) {
     ctx.save();
     ctx.strokeStyle = "rgba(255,255,255,0.82)";
-    ctx.lineWidth = 22;
+    ctx.lineWidth = 20;
     ctx.beginPath();
-    ctx.roundRect(28, 34, width - 56, height - 68, 48);
+    ctx.roundRect(62, 24, width - 124, height - 48, 38);
     ctx.stroke();
 
     ctx.fillStyle = "rgba(255,255,255,0.64)";
     ctx.beginPath();
-    ctx.roundRect(width / 2 - 220, height - 120, 440, 60, 30);
+    ctx.roundRect(width / 2 - 180, height - 112, 360, 54, 27);
     ctx.fill();
 
     ctx.fillStyle = "rgba(103,68,96,0.76)";
-    ctx.font = '700 36px "Fredoka", sans-serif';
+    ctx.font = '700 34px "Fredoka", sans-serif';
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(frame.tagline, width / 2, height - 90);
+    ctx.fillText(frame.tagline, width / 2, height - 85);
     ctx.restore();
   }
 

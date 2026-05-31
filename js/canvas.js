@@ -99,11 +99,11 @@
 
   function getPhotoRects(count, width, height, mode) {
     const photoCount = Math.max(1, count);
-    const photoRatio = 0.82;
+    const photoRatio = 16 / 9;
 
     if (mode === "square") {
       if (photoCount === 1) {
-        return [{ x: 150, y: 135, width: 780, height: 650, radius: 46, polaroid: true }];
+        return [{ x: 130, y: 200, width: 820, height: 462, radius: 46, polaroid: true }];
       }
 
       if (photoCount === 2) {
@@ -147,7 +147,7 @@
     }
 
     if (photoCount === 1) {
-      return [{ x: 160, y: 255, width: 760, height: 880, radius: 52, polaroid: true }];
+      return [{ x: 110, y: 420, width: 860, height: 484, radius: 52, polaroid: true }];
     }
 
     if (photoCount === 2) {
